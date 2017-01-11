@@ -1,6 +1,6 @@
 # _*_ coding: utf-8 _*_
 
-from flask import Flask, make_response, render_template, request, redirect, url_for
+from flask import Flask, make_response, render_template, request, redirect, url_for, jsonify
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -9,6 +9,22 @@ import matplotlib.pyplot as plt
 import StringIO
 
 app = Flask(__name__)
+
+models = [
+    {
+        'id' : 1,
+        'title' : '日用品を買ってくる',
+        'description' : 'ミルク、チーズ、ピザ、フルーツ',
+        'done' : False
+    },
+    {
+        'id' : 2,
+        'title' : 'Pythonの勉強',
+        'description' : 'PythonでRESTful APIを作る',
+        'done' : False
+    }
+]
+
 
 @app.route('/')
 def hello_world():
@@ -28,6 +44,10 @@ def graph1():
     strio.seek(0)
     svgstr = strio.buf[strio.buf.find("<svg"):]
     return render_template("graph.html", svgstr=svgstr.decode("utf-8"))
+
+@app.route('/api/', methods=['GET'])
+def get_api():
+    return jsonify({'models': models})
 
 if __name__ == '__main__':
     app.run()
