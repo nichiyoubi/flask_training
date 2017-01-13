@@ -7,6 +7,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import StringIO
+import json
 
 app = Flask(__name__)
 
@@ -32,7 +33,6 @@ def hello_world():
 
 @app.route('/graph1')
 def graph1():
-#    return 'Graph1'
     fig = plt.figure()
     x = range(0, 6)
     y = [0.2, 3.0, -1.2, -0,5, 1.4, 2.3]
@@ -48,6 +48,18 @@ def graph1():
 @app.route('/api/', methods=['GET'])
 def get_api():
     return jsonify({'models': models})
+
+@app.route('/api/', methods=['POST'])
+def post_api():
+    print "POST!"
+    if request.headers['Content-Type'] != 'application/json':
+	print(request.data)
+	return jsonify(res='error') 
+
+    print request.headers['Content-Type']
+    print request.data
+#    print json.loads(request.data)
+    return jsonify(res='ok')
 
 if __name__ == '__main__':
     app.run()
