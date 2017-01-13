@@ -10,11 +10,12 @@ models = {
         'description' : '車、家、クルーザー、宝石',
         'done' : False
     }
+light = { 'time' : 1, 'value' : 400 }
 
 url = 'http://localhost:5000/api/'
 
 # data = urllib.urlencode(models).encode("utf-8")
-req = urllib2.Request(url, json.dumps(models))
+req = urllib2.Request(url, json.dumps(light))
 req.add_header('Content-Type', 'application/json')
 response = urllib2.urlopen(req)
 print(response.read())

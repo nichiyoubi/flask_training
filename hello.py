@@ -9,8 +9,7 @@ import matplotlib.pyplot as plt
 import StringIO
 import json
 
-app = Flask(__name__)
-
+filename = 'light.json'
 models = [
     {
         'id' : 1,
@@ -25,6 +24,19 @@ models = [
         'done' : False
     }
 ]
+light_value = [
+	{ 'time' : 1,
+	  'value' : 0
+	}
+]
+
+try:
+	light_file = open(filename, 'r+')
+	light_json = json.load(light_file)
+except:
+	light_json = json.dumps(light_value)
+
+app = Flask(__name__)
 
 
 @app.route('/')
@@ -57,8 +69,12 @@ def post_api():
 	print(request.data)
 	return jsonify(res='error') 
 
-    print request.headers['Content-Type']
     print request.json
+    light_value.append(request.json)
+    print light_value
+#    print json.dumps(light_value)
+#    json.dump(light_value, light_file)
+#    light_file.write(light_value)
     return jsonify(res='ok')
 
 if __name__ == '__main__':
