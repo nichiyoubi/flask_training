@@ -47,6 +47,7 @@ def graph1():
 
 @app.route('/api/', methods=['GET'])
 def get_api():
+    print "GET!"
     return jsonify({'models': models})
 
 @app.route('/api/', methods=['POST'])
@@ -57,8 +58,7 @@ def post_api():
 	return jsonify(res='error') 
 
     print request.headers['Content-Type']
-    print request.data
-#    print json.loads(request.data)
+    print request.json
     return jsonify(res='ok')
 
 if __name__ == '__main__':
