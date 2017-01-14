@@ -24,14 +24,12 @@ models = [
         'done' : False
     }
 ]
-light_value = [
-]
+light_value = []
 
 try:
 	light_file = open(filename, 'r+')
         light_file.seek(0)
         light_value = json.load(light_file)
-        light_file.seek(0)
 except:
         light_file = open(filename, 'w')
 
@@ -59,21 +57,32 @@ def graph1():
 
 @app.route('/api/', methods=['GET'])
 def get_api():
+    global light_value
     print "GET!"
-    return jsonify({'models': models})
+    return jsonify({'light' : light_value})
 
 @app.route('/api/', methods=['POST'])
 def post_api():
+    global light_value
     print "POST!"
     if request.headers['Content-Type'] != 'application/json':
-	print(request.data)
 	return jsonify(res='error') 
 
     light_value.append(request.json)
-#    print json.dumps(light_value)
     return jsonify(res='ok')
+
+@app.route('/api/', methods=['DELETE'])
+def delete_api():
+    global light_value
+    print "DELETE!"
+    light_value = []
+    light_file.seek(0)
+    json.dump(light_value, light_file)
+    return jsonify(res='ok')
+
 
 if __name__ == '__main__':
     app.run()
+    light_file.seek(0)
     json.dump(light_value, light_file)
     
