@@ -25,16 +25,16 @@ models = [
     }
 ]
 light_value = [
-	{ 'time' : 1,
-	  'value' : 0
-	}
 ]
 
 try:
 	light_file = open(filename, 'r+')
-	light_json = json.load(light_file)
+        light_file.seek(0)
+        light_value = json.load(light_file)
+        light_file.seek(0)
 except:
-	light_json = json.dumps(light_value)
+        light_file = open(filename, 'w')
+
 
 app = Flask(__name__)
 
@@ -69,14 +69,11 @@ def post_api():
 	print(request.data)
 	return jsonify(res='error') 
 
-    print request.json
     light_value.append(request.json)
-    print light_value
 #    print json.dumps(light_value)
-#    json.dump(light_value, light_file)
-#    light_file.write(light_value)
     return jsonify(res='ok')
 
 if __name__ == '__main__':
     app.run()
+    json.dump(light_value, light_file)
     
