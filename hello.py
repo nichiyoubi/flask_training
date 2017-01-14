@@ -47,7 +47,6 @@ def hello_world():
 def graph1():
     global light_sensor_time
     global light_sensor_value
-    title = "センサー値グラフ"
     fig = plt.figure()
     nx = np.array(light_sensor_time)
     ny = np.array(light_sensor_value)
@@ -58,7 +57,8 @@ def graph1():
 
     strio.seek(0)
     svgstr = strio.buf[strio.buf.find("<svg"):]
-    return render_template("graph.html", svgstr=svgstr.decode("utf-8"))
+    return render_template("graph.html",
+                           svgstr=svgstr.decode("utf-8"), title="sensor value")
 
 @app.route('/api/', methods=['GET'])
 def get_api():
