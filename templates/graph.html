@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html lang="ja">
-    <head>
-        <title>グラフテスト</title>
-    </head>
-    <body>
-        <h1>グラフ</h1>
-        {% autoescape false %}{{svgstr}}{% endautoescape %}
-    </body>
-</html>
+{% extends "layout.html" %}
+{% block content %}
+  <!-- Form
+       ======================================================== -->
+  <div class="form">
+    <div class="container">
+      <div class="row">
+	<div class="col-md-12">
+	  {% autoescape false %}{{svgstr}}{% endautoescape %}
+	</div>
+      </div>
+    </div>
+  <div>
+{% endblock %}

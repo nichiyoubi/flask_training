@@ -25,6 +25,8 @@ models = [
     }
 ]
 light_value = []
+light_sensor_time = []
+light_sensor_value = []
 
 try:
 	light_file = open(filename, 'r+')
@@ -43,17 +45,20 @@ def hello_world():
 
 @app.route('/graph1')
 def graph1():
+    global light_sensor_time
+    global light_sensor_value
     fig = plt.figure()
-    x = range(0, 6)
-    y = [0.2, 3.0, -1.2, -0,5, 1.4, 2.3]
-    plt.plot(y, label="matplotlib test")
+    nx = np.array(light_sensor_time)
+    ny = np.array(light_sensor_value)
+    plt.plot(nx, ny, label="matplotlib test")
     strio = StringIO.StringIO()
     fig.savefig(strio, format="svg")
     plt.close(fig)
 
     strio.seek(0)
     svgstr = strio.buf[strio.buf.find("<svg"):]
-    return render_template("graph.html", svgstr=svgstr.decode("utf-8"))
+    return render_template("graph.html",
+                           svgstr=svgstr.decode("utf-8"), title="sensor value")
 
 @app.route('/api/', methods=['GET'])
 def get_api():
@@ -64,11 +69,15 @@ def get_api():
 @app.route('/api/', methods=['POST'])
 def post_api():
     global light_value
+    global light_sensor_time
+    global light_sensor_value
     print "POST!"
     if request.headers['Content-Type'] != 'application/json':
 	return jsonify(res='error') 
 
     light_value.append(request.json)
+    light_sensor_time.append(request.json['time'])
+    light_sensor_value.append(request.json['value'])
     return jsonify(res='ok')
 
 @app.route('/api/', methods=['DELETE'])
