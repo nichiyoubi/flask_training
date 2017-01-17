@@ -8,6 +8,9 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import StringIO
 import json
+import sqlalchemy
+from flask_sqlalchemy import SQLAlchemy
+
 
 filename = 'light.json'
 models = [
@@ -37,6 +40,9 @@ except:
 
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/mydb'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app)
 
 
 @app.route('/')
