@@ -40,10 +40,35 @@ except:
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/mydb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:Masanori1972@localhost/'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(64))
+    email = db.Column(db.String(64), unique=True)
+
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+        
+    def __repr__(self):
+        return '<User %r>' % self.name
+
+class LightValue(db.Model):
+    __tablename__ = 'light_value'
+    id = db.Column(db.Integer, primary_key = True)
+    time = db.Column(db.Integer)
+    light = db.Column(db.Float)
+    
+    def __init__(self, time, light):
+        self.time = time
+        self.light = light
+    
+    def __repr__(self):
+        return '<Time %d, Light %f>' % (self.time, self.light)
 
 @app.route('/')
 def hello_world():
@@ -97,6 +122,11 @@ def delete_api():
 
 
 if __name__ == '__main__':
+    users = User.query.all()
+    lights = LightValue.query.all()
+    print users
+    print lights
+
     app.run()
     light_file.seek(0)
     json.dump(light_value, light_file)
