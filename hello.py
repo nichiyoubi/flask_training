@@ -1,5 +1,6 @@
 # _*_ coding: utf-8 _*_
 
+import os
 from flask import Flask, make_response, render_template, request, redirect, url_for, jsonify
 import numpy as np
 import pandas as pd
@@ -8,7 +9,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import StringIO
 import json
-import sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -40,9 +40,24 @@ except:
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/mydb'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
+
+# 光センサー テーブル モデル
+class Light(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    time = db.Column(db.Integer)
+    light = db.Column(db.Float)
+
+    def __init__(self, time, light):
+        self.time = time
+        self.light = light
+
+    def __repr__(self):
+        return '<Time %d Light %f>' % (self.time, self.light)
+
+print Light.query.all()
 
 
 @app.route('/')
