@@ -97,6 +97,13 @@ def get_api():
     print "GET!"
     return jsonify({'light' : light_value})
 
+@app.route('/api/<int:id>', methods=['GET'])
+def get_api_id(id):
+    print "GET!:", id
+    lights = LightValue.query.filter(LightValue.time == id).all()
+    print lights
+    return jsonify({'light' : {'time' : lights.time, 'value' : lights.light }})
+
 @app.route('/api/', methods=['POST'])
 def post_api():
     global light_value
@@ -126,7 +133,6 @@ if __name__ == '__main__':
     lights = LightValue.query.all()
     print users
     print lights
-
     app.run()
     light_file.seek(0)
     json.dump(light_value, light_file)
