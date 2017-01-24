@@ -1,5 +1,6 @@
 # _*_ coding: utf-8 _*_
 
+import os
 from flask import Flask, make_response, render_template, request, redirect, url_for, jsonify
 import numpy as np
 import pandas as pd
@@ -8,42 +9,40 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import StringIO
 import json
-import sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 
 
-filename = 'light.json'
-models = [
-    {
-        'id' : 1,
-        'title' : '日用品を買ってくる',
-        'description' : 'ミルク、チーズ、ピザ、フルーツ',
-        'done' : False
-    },
-    {
-        'id' : 2,
-        'title' : 'Pythonの勉強',
-        'description' : 'PythonでRESTful APIを作る',
-        'done' : False
-    }
-]
-light_value = []
-light_sensor_time = []
-light_sensor_value = []
-
-try:
-	light_file = open(filename, 'r+')
-        light_file.seek(0)
-        light_value = json.load(light_file)
-except:
-        light_file = open(filename, 'w')
-
-
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/mydb'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(64))
+    email = db.Column(db.String(64), unique=True)
+
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+        
+    def __repr__(self):
+        return '<User %r>' % self.name
+
+class LightValue(db.Model):
+    __tablename__ = 'light_value'
+    id = db.Column(db.Integer, primary_key = True)
+    time = db.Column(db.Integer)
+    light = db.Column(db.Float)
+    
+    def __init__(self, time, light):
+        self.time = time
+        self.light = light
+    
+    def __repr__(self):
+        return '<Time %d, Light %f>' % (self.time, self.light)
 
 @app.route('/')
 def hello_world():
@@ -51,11 +50,13 @@ def hello_world():
 
 @app.route('/graph1')
 def graph1():
-    global light_sensor_time
-    global light_sensor_value
     fig = plt.figure()
-    nx = np.array(light_sensor_time)
-    ny = np.array(light_sensor_value)
+    lights = LightValue.query.filter().all()
+    nx = np.array([])
+    ny = np.array([])
+    for x in lights:
+	nx = np.append(nx, x.time)
+	ny = np.append(ny, x.light)
     plt.plot(nx, ny, label="matplotlib test")
     strio = StringIO.StringIO()
     fig.savefig(strio, format="svg")
@@ -68,36 +69,47 @@ def graph1():
 
 @app.route('/api/', methods=['GET'])
 def get_api():
-    global light_value
     print "GET!"
-    return jsonify({'light' : light_value})
+    lights = LightValue.query.filter().all()
+    if (len(lights) > 0):
+	result = []
+	for x in lights:
+	    light = { 'time' : x.time, 'value' : x.light }
+	    result.append(light)
+	return jsonify({'light' : result})
+    else:
+	return jsonify(res='error') 
+
+@app.route('/api/<int:id>', methods=['GET'])
+def get_api_id(id):
+    lights = LightValue.query.filter(LightValue.time == id).all()
+    if (len(lights) > 0):
+	light = { 'time' : lights[0].time, 'value' : lights[0].light }
+	return jsonify({'light' : light})
+    else:
+	return jsonify(res='error') 
 
 @app.route('/api/', methods=['POST'])
 def post_api():
-    global light_value
-    global light_sensor_time
-    global light_sensor_value
     print "POST!"
     if request.headers['Content-Type'] != 'application/json':
 	return jsonify(res='error') 
 
-    light_value.append(request.json)
-    light_sensor_time.append(request.json['time'])
-    light_sensor_value.append(request.json['value'])
+    light = LightValue(request.json['time'], request.json['value'])
+    db.session.add(light)
+    db.session.commit()
     return jsonify(res='ok')
 
 @app.route('/api/', methods=['DELETE'])
 def delete_api():
-    global light_value
+#    global light_value
     print "DELETE!"
-    light_value = []
-    light_file.seek(0)
-    json.dump(light_value, light_file)
+#    light_value = []
+#    light_file.seek(0)
+#    json.dump(light_value, light_file)
     return jsonify(res='ok')
 
 
 if __name__ == '__main__':
     app.run()
-    light_file.seek(0)
-    json.dump(light_value, light_file)
     
