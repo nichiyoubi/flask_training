@@ -77,12 +77,18 @@ def hello_world():
 
 @app.route('/graph1')
 def graph1():
-    global light_sensor_time
-    global light_sensor_value
+#    global light_sensor_time
+#    global light_sensor_value
     fig = plt.figure()
-    nx = np.array(light_sensor_time)
-    ny = np.array(light_sensor_value)
-    plt.plot(nx, ny, label="matplotlib test")
+    tmp = LightValue.query.filter().all()
+    nx2 = np.array([])
+    ny2 = np.array([])
+    for x in tmp:
+	nx2 = np.append(nx2, x.time)
+	ny2 = np.append(ny2, x.light)
+#    nx = np.array(light_sensor_time)
+#    ny = np.array(light_sensor_value)
+    plt.plot(nx2, ny2, label="matplotlib test")
     strio = StringIO.StringIO()
     fig.savefig(strio, format="svg")
     plt.close(fig)
@@ -100,23 +106,30 @@ def get_api():
 
 @app.route('/api/<int:id>', methods=['GET'])
 def get_api_id(id):
-    print "GET!:", id
-    lights = LightValue.query.filter(LightValue.time == id).all()
-    print lights
-    return jsonify({'light' : {'time' : lights.time, 'value' : lights.light }})
+    tmp = LightValue.query.filter(LightValue.time == id).all()
+    if (len(tmp) > 0):
+	light = { 'time' : 0, 'value' : 0.1 }
+	light['time'] = tmp[0].time
+	light['value'] = tmp[0].light
+	return jsonify({'light' : light})
+    else:
+	return jsonify(res='error') 
 
 @app.route('/api/', methods=['POST'])
 def post_api():
-    global light_value
-    global light_sensor_time
-    global light_sensor_value
+#    global light_value
+#    global light_sensor_time
+#    global light_sensor_value
     print "POST!"
     if request.headers['Content-Type'] != 'application/json':
 	return jsonify(res='error') 
 
-    light_value.append(request.json)
-    light_sensor_time.append(request.json['time'])
-    light_sensor_value.append(request.json['value'])
+#    light_value.append(request.json)
+#    light_sensor_time.append(request.json['time'])
+#    light_sensor_value.append(request.json['value'])
+    light = LightValue(request.json['time'], request.json['value'])
+    db.session.add(light)
+    db.session.commit()
     return jsonify(res='ok')
 
 @app.route('/api/', methods=['DELETE'])
