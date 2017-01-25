@@ -13,8 +13,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/'
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:Masanori1972@localhost/'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
@@ -102,13 +102,23 @@ def post_api():
 
 @app.route('/api/', methods=['DELETE'])
 def delete_api():
-#    global light_value
     print "DELETE!"
-#    light_value = []
-#    light_file.seek(0)
-#    json.dump(light_value, light_file)
-    return jsonify(res='ok')
+    lights = LightValue.query.filter().all()
+    if (len(lights) > 0):
+        for x in lights:
+            db.session.delete(x)
+            db.session.commit()
+	return jsonify(res='ok') 
+    else:
+	return jsonify(res='error') 
 
+@app.route('/api/<int:id>', methods=['DELETE'])
+def delete_api_id(id):
+    print "DELETE!"
+    lights = LightValue.query.filter(LightValue.id == id).first()
+    db.session.delete(lights)
+    db.session.commit()
+    return jsonify(res='ok') 
 
 if __name__ == '__main__':
     app.run()
