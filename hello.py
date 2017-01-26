@@ -44,8 +44,14 @@ class LightValue(db.Model):
     def __repr__(self):
         return '<Time %d, Light %f>' % (self.time, self.light)
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def hello_world():
+    return render_template("index.html")
+
+@app.route('/', methods=['POST'])
+def post_root():
+    print request.form['email']
+    print request.form['password']
     return render_template("index.html")
 
 @app.route('/graph1')
