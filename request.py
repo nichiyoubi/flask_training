@@ -7,8 +7,8 @@ import random
 
 light = { 'time' : 1, 'value' : 400 }
 
-url = 'http://localhost:5000/api/'
-# url = 'https://quiet-earth-43690.herokuapp.com/api/'
+# url = 'http://localhost:5000/api/'
+url = 'https://quiet-earth-43690.herokuapp.com/api/'
 
 light['time'] = random.randint(1, 10)
 light['value'] = random.uniform(1, 500)
