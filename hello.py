@@ -44,15 +44,28 @@ class LightValue(db.Model):
     def __repr__(self):
         return '<Time %d, Light %f>' % (self.time, self.light)
 
+# 表紙ページ（ログイン画面）
 @app.route('/', methods=['GET'])
-def hello_world():
+def index():
     return render_template("index.html")
 
-@app.route('/', methods=['POST'])
-def post_root():
+# エラーハンドラ
+@app.errorhandler(404)
+@app.errorhandler(405)
+def error_handler(error):
+    return redirect(url_for('index'))
+
+# ログイン処理
+@app.route('/login', methods=['POST'])
+def login():
     print request.form['email']
     print request.form['password']
     return render_template("index.html")
+
+# ログアウト処理
+@app.route('/logout')
+def logout():
+    return redirect(url_for('index'))
 
 @app.route('/graph1')
 def graph1():
