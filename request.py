@@ -5,11 +5,12 @@ import urllib2
 import json
 import random
 
-light = { 'time' : 1, 'value' : 400 }
+light = { 'mac' : 'abcdef01', 'time' : 1, 'value' : 400 }
 
 url = 'http://localhost:5000/api/'
 # url = 'https://quiet-earth-43690.herokuapp.com/api/'
 
+light['mac'] = 'abcdef' + str(random.randint(1,99))
 light['time'] = random.randint(1, 10)
 light['value'] = random.uniform(1, 500)
 req = urllib2.Request(url, json.dumps(light))
