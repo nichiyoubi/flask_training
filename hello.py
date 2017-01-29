@@ -34,20 +34,48 @@ class User(db.Model):
 class LightValue(db.Model):
     __tablename__ = 'light_value'
     id = db.Column(db.Integer, primary_key = True)
+    mac = db.Column(db.String(8))
     time = db.Column(db.Integer)
     light = db.Column(db.Float)
     
-    def __init__(self, time, light):
+    def __init__(self, mac, time, light):
+        self.mac = mac
         self.time = time
         self.light = light
     
     def __repr__(self):
-        return '<Time %d, Light %f>' % (self.time, self.light)
+        return '<Mac %r Time %d, Light %f>' % (self.mac, self.time, self.light)
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
+# 表紙ページ（ログイン画面）
+@app.route('/', methods=['GET'])
+def index():
+    return render_template("index.html")
 
+# エラーハンドラ
+@app.errorhandler(404)
+@app.errorhandler(405)
+def error_handler(error):
+    return redirect(url_for('index'))
+
+# ログイン処理
+@app.route('/login', methods=['POST'])
+def login():
+    print request.form['email']
+    print request.form['password']
+    return redirect(url_for('device'))
+
+# ログアウト処理
+@app.route('/logout')
+def logout():
+    return redirect(url_for('index'))
+
+# デバイス一覧
+@app.route('/device')
+def device():
+    devices = db.engine.execute("select distinct mac from Light_Value;")
+    return render_template("device.html", lights = devices)
+
+# グラフ表示
 @app.route('/graph1')
 def graph1():
     fig = plt.figure()
@@ -74,7 +102,7 @@ def get_api():
     if (len(lights) > 0):
 	result = []
 	for x in lights:
-	    light = { 'time' : x.time, 'value' : x.light }
+	    light = { 'mac' : x.mac, 'time' : x.time, 'value' : x.light }
 	    result.append(light)
 	return jsonify({'light' : result})
     else:
@@ -84,7 +112,7 @@ def get_api():
 def get_api_id(id):
     lights = LightValue.query.filter(LightValue.time == id).all()
     if (len(lights) > 0):
-	light = { 'time' : lights[0].time, 'value' : lights[0].light }
+	light = { 'mac' : lights[0].mac, 'time' : lights[0].time, 'value' : lights[0].light }
 	return jsonify({'light' : light})
     else:
 	return jsonify(res='error') 
@@ -95,7 +123,7 @@ def post_api():
     if request.headers['Content-Type'] != 'application/json':
 	return jsonify(res='error') 
 
-    light = LightValue(request.json['time'], request.json['value'])
+    light = LightValue(request.json['mac'], request.json['time'], request.json['value'])
     db.session.add(light)
     db.session.commit()
     return jsonify(res='ok')
