@@ -2,6 +2,7 @@
 
 import os
 from flask import Flask, make_response, render_template, request, redirect, url_for, jsonify
+from flask import session
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -16,6 +17,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:Masanori1972@localhost/'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+# 秘密鍵は後ほどランダム化する
+app.config['SECRET_KEY'] = 'The secret key which ciphers the cookie'
 db = SQLAlchemy(app)
 
 class User(db.Model):
@@ -62,18 +65,35 @@ def error_handler(error):
 def login():
     print request.form['email']
     print request.form['password']
-    return redirect(url_for('device'))
+    if _is_account_valid():
+        session['email'] = request.form['email']
+        return redirect(url_for('device'))
+    return redirect(url_for('index'))
+
+# アカウントのチェック
+def _is_account_valid():
+    if request.form.get('email') is None:
+        return False
+    else:
+        return True
 
 # ログアウト処理
 @app.route('/logout')
 def logout():
+    # セッションからユーザー名を取り除く
+    session.pop('email', None)
+    # 表紙（ログインページ）にリダイレクトする
     return redirect(url_for('index'))
 
 # デバイス一覧
 @app.route('/device')
 def device():
-    devices = db.engine.execute("select distinct mac from Light_Value;")
-    return render_template("device.html", lights = devices)
+    # セッションにemailが保存されていなければ表紙ページにリダイレクトする
+    if session.get('email') is not None:
+        devices = db.engine.execute("select distinct mac from Light_Value;")
+        return render_template("device.html", lights = devices)
+    else:
+        return redirect(url_for('index'))
 
 # グラフ表示
 @app.route('/graph1')
