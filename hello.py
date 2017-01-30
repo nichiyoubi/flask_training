@@ -14,8 +14,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:Masanori1972@localhost/'
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:Masanori1972@localhost/'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # 秘密鍵は後ほどランダム化する
 app.config['SECRET_KEY'] = 'The secret key which ciphers the cookie'
@@ -94,12 +94,12 @@ def device():
         return redirect(url_for('index'))
 
 # グラフ表示
-@app.route('/graph1')
-def graph1():
+@app.route('/graph/<mac>')
+def graph(mac):
     # セッションにemailが保存されていなければ表紙ページにリダイレクトする
     if session.get('email') is not None:
         fig = plt.figure()
-        lights = LightValue.query.filter().all()
+        lights = LightValue.query.filter(LightValue.mac == mac).all()
         nx = np.array([])
         ny = np.array([])
         for x in lights:
@@ -117,11 +117,21 @@ def graph1():
     else:
         return redirect(url_for('index'))
 
-@app.route('/api/', methods=['GET'])
-def get_api():
+# 表の表示
+@app.route('/table/<mac>')
+def table(mac):
     # セッションにemailが保存されていなければ表紙ページにリダイレクトする
     if session.get('email') is not None:
-        print "GET!"
+        lights = LightValue.query.filter(LightValue.mac == mac).all()
+        return render_template("light_table.html", lights = lights)
+    else:
+        return redirect(url_for('index'))
+
+# LightValueテーブルの一覧の取得
+@app.route('/light', methods=['GET'])
+def get_lights():
+    # セッションにemailが保存されていなければ表紙ページにリダイレクトする
+    if session.get('email') is not None:
         lights = LightValue.query.filter().all()
         if (len(lights) > 0):
 	    result = []
@@ -132,10 +142,11 @@ def get_api():
         else:
 	    return jsonify(res='error')
     else:
-        return redirect(url_for('index'))
+	return jsonify(res='no session')
 
-@app.route('/api/<int:id>', methods=['GET'])
-def get_api_id(id):
+# LightValueテーブルのレコードの取得
+@app.route('/light/<int:id>', methods=['GET'])
+def get_light(id):
     # セッションにemailが保存されていなければ表紙ページにリダイレクトする
     if session.get('email') is not None:
         lights = LightValue.query.filter(LightValue.time == id).all()
@@ -145,10 +156,11 @@ def get_api_id(id):
         else:
 	    return jsonify(res='error')
     else:
-        return redirect(url_for('index'))
+	return jsonify(res='no session')
 
-@app.route('/api/', methods=['POST'])
-def post_api():
+# LightValueテーブルへのレコードの追加
+@app.route('/light', methods=['POST'])
+def post_light():
     # セッションにemailが保存されていなければ表紙ページにリダイレクトする
     if session.get('email') is not None:
         if request.headers['Content-Type'] != 'application/json':
@@ -159,10 +171,11 @@ def post_api():
         db.session.commit()
         return jsonify(res='ok')
     else:
-        return redirect(url_for('index'))
+	return jsonify(res='no session')
 
-@app.route('/api/', methods=['DELETE'])
-def delete_api():
+# LightValueテーブルへの全レコード削除
+@app.route('/light', methods=['DELETE'])
+def delete_lights():
     # セッションにemailが保存されていなければ表紙ページにリダイレクトする
     if session.get('email') is not None:
         lights = LightValue.query.filter().all()
@@ -174,10 +187,11 @@ def delete_api():
         else:
 	    return jsonify(res='error')
     else:
-        return redirect(url_for('index'))
+	return jsonify(res='error')
 
-@app.route('/api/<int:id>', methods=['DELETE'])
-def delete_api_id(id):
+# LightValueテーブルへのレコードの削除
+@app.route('/light/<int:id>', methods=['DELETE'])
+def delete_light(id):
     # セッションにemailが保存されていなければ表紙ページにリダイレクトする
     if session.get('email') is not None:
         lights = LightValue.query.filter(LightValue.id == id).first()
@@ -185,7 +199,7 @@ def delete_api_id(id):
         db.session.commit()
         return jsonify(res='ok')
     else:
-        return redirect(url_for('index'))
+	return jsonify(res='error')
 
 if __name__ == '__main__':
     app.run()

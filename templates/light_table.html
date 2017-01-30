@@ -4,22 +4,22 @@
   <link href="/static/css/signin.css" rel="stylesheet">
 
   <div class="container">
-    <h2>デバイス一覧</h2>
+    <h2>センサー値一覧</h2>
     <div class="table-responsive">
       <table class="table table-striped">
 	<thead>
 	  <tr>
 	    <th>MAC</th>
-	    <th>リンク（表）</th>
-	    <th>リンク（グラフ）</th>
+	    <th>TIME</th>
+	    <th>VALUE</th>
 	  </tr>
 	</thead>
 	<tbody>
 	  {% for light in lights %}
 	  <tr>
 	    <td>{{light.mac}}</td>
-	    <td><a href="/table/{{light.mac}}">表</a></td>
-	    <td><a href="/graph/{{light.mac}}">グラフ</a></td>
+	    <td>{{light.time}}</td>
+	    <td>{{light.light}}</td>
 	  </tr>
 	  {% else %}
 	    <td>デバイスが登録されていません</td>
