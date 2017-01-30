@@ -9,22 +9,22 @@
       <table class="table table-striped">
 	<thead>
 	  <tr>
-<!--	    <th>ID</th> -->
 	    <th>MAC</th>
-<!--	    <th>TIME</th> -->
-<!-- 	    <th>LIGHT VALUE</th> -->
+	    <th>リンク（表）</th>
+	    <th>リンク（グラフ）</th>
 	  </tr>
 	</thead>
 	<tbody>
 	  {% for light in lights %}
 	  <tr>
-<!--	    <td>{{light.id}}</td> -->
 	    <td>{{light.mac}}</td>
-<!-- 	    <td>{{light.time}}</td> -->
-<!--	    <td>{{light.light}}</td> -->
+	    <td><a href="/table/{{light.mac}}">表</a></td>
+	    <td><a href="/graph/{{light.mac}}">グラフ</a></td>
 	  </tr>
 	  {% else %}
 	    <td>デバイスが登録されていません</td>
+	    <td></td>
+	    <td></td>
 	  {% endfor %}
 	</tbody>
       </table>
