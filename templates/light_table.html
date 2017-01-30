@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+  <!-- Custom styles for this template -->
+  <link href="/static/css/signin.css" rel="stylesheet">
+
+  <div class="container">
+    <h2>センサー値一覧</h2>
+    <div class="table-responsive">
+      <table class="table table-striped">
+	<thead>
+	  <tr>
+	    <th>MAC</th>
+	    <th>TIME</th>
+	    <th>VALUE</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  {% for light in lights %}
+	  <tr>
+	    <td>{{light.mac}}</td>
+	    <td>{{light.time}}</td>
+	    <td>{{light.light}}</td>
+	  </tr>
+	  {% else %}
+	    <td>デバイスが登録されていません</td>
+	    <td></td>
+	    <td></td>
+	  {% endfor %}
+	</tbody>
+      </table>
+    </div>
+
+  </div> <!-- /container -->
+{% endblock %}
+

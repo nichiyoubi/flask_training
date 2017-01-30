@@ -94,12 +94,12 @@ def device():
         return redirect(url_for('index'))
 
 # グラフ表示
-@app.route('/graph1')
-def graph1():
+@app.route('/graph/<mac>')
+def graph(mac):
     # セッションにemailが保存されていなければ表紙ページにリダイレクトする
     if session.get('email') is not None:
         fig = plt.figure()
-        lights = LightValue.query.filter().all()
+        lights = LightValue.query.filter(LightValue.mac == mac).all()
         nx = np.array([])
         ny = np.array([])
         for x in lights:
@@ -114,6 +114,16 @@ def graph1():
         svgstr = strio.buf[strio.buf.find("<svg"):]
         return render_template("graph.html",
                            svgstr=svgstr.decode("utf-8"), title="sensor value")
+    else:
+        return redirect(url_for('index'))
+
+# 表の表示
+@app.route('/table/<mac>')
+def table(mac):
+    # セッションにemailが保存されていなければ表紙ページにリダイレクトする
+    if session.get('email') is not None:
+        lights = LightValue.query.filter(LightValue.mac == mac).all()
+        return render_template("light_table.html", lights = lights)
     else:
         return redirect(url_for('index'))
 
