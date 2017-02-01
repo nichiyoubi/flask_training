@@ -9,7 +9,7 @@ import random
 url_login = 'http://localhost:5000/login'
 # url_login = 'https://quiet-earth-43690.herokuapp.com/login'
 url_light = 'http://localhost:5000/light'
-# url_post = 'https://quiet-earth-43690.herokuapp.com/light'
+# url_light = 'https://quiet-earth-43690.herokuapp.com/light'
 
 
 req = urllib2.Request(url_login, 'email=%s&password=%s' % ('', ''))

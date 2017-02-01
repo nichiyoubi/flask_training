@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+
+  <div class="container">
+    <h2>ユーザー一覧</h2>
+    <div class="table-responsive">
+      <table class="table table-striped">
+	<thead>
+	  <tr>
+	    <th>ユーザー名</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  {% for user in users %}
+	  <tr>
+	    <td>{{user.username}}</td>
+	  </tr>
+	  {% else %}
+	    <td>ユーザーが登録されていません</td>
+	  {% endfor %}
+	</tbody>
+      </table>
+    </div>
+
+  </div> <!-- /container -->
+{% endblock %}
+
