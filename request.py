@@ -6,13 +6,13 @@ import cookielib
 import json
 import random
 
-url_login = 'http://localhost:5000/login'
+url_login = 'http://localhost:5000/api/login'
 # url_login = 'https://quiet-earth-43690.herokuapp.com/login'
-url_light = 'http://localhost:5000/light'
+url_light = 'http://localhost:5000/api/light'
 # url_light = 'https://quiet-earth-43690.herokuapp.com/light'
 
 
-req = urllib2.Request(url_login, 'email=%s&password=%s' % ('', ''))
+req = urllib2.Request(url_login, 'username=%s&password=%s' % ('admin', 'administrator'))
 opener = urllib2.build_opener()
 opener.add_handler(urllib2.HTTPCookieProcessor(cookielib.CookieJar()))
 conn = opener.open(req)
