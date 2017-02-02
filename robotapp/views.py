@@ -1,7 +1,7 @@
 # _*_ coding: utf-8 _*_
 
-import os
-from flask import Flask, make_response, render_template, request, redirect
+from robotapp import app
+from flask import make_response, render_template, request, redirect
 from flask import url_for, jsonify, session
 import numpy as np
 import pandas as pd
@@ -13,12 +13,6 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 
 
-app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:Masanori1972@localhost/'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-# 秘密鍵は後ほどランダム化する
-app.config['SECRET_KEY'] = 'The secret key which ciphers the cookie'
 db = SQLAlchemy(app)
 
 class User(db.Model):
@@ -238,6 +232,3 @@ def api_delete_light(id):
     else:
 	return jsonify(res='error')
 
-if __name__ == '__main__':
-    app.run()
-    
