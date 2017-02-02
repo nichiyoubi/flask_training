@@ -1,7 +1,7 @@
 # _*_ coding: utf-8 _*_
 
-import os
-from flask import Flask, make_response, render_template, request, redirect
+from robotapp import app
+from flask import make_response, render_template, request, redirect
 from flask import url_for, jsonify, session
 import numpy as np
 import pandas as pd
@@ -13,12 +13,6 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:Masanori1972@localhost/'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-# 秘密鍵は後ほどランダム化する
-app.config['SECRET_KEY'] = 'The secret key which ciphers the cookie'
 db = SQLAlchemy(app)
 
 class User(db.Model):
@@ -144,9 +138,29 @@ def table(mac):
     else:
         return redirect(url_for('index'))
 
+#############################################################################
+# API
+#############################################################################
+
+# ログイン処理
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    if _is_account_valid():
+        session['username'] = request.form['username']
+	return jsonify(res='ok')
+    return jsonify(res='error')
+
+# ログアウト処理
+@app.route('/api/logout')
+def api_logout():
+    # セッションからユーザー名を取り除く
+    session.pop('username', None)
+    return jsonify(res='ok')
+
+
 # LightValueテーブルの一覧の取得
-@app.route('/light', methods=['GET'])
-def get_lights():
+@app.route('/api/light', methods=['GET'])
+def api_get_lights():
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
         lights = LightValue.query.filter().all()
@@ -162,8 +176,8 @@ def get_lights():
 	return jsonify(res='no session')
 
 # LightValueテーブルのレコードの取得
-@app.route('/light/<int:id>', methods=['GET'])
-def get_light(id):
+@app.route('/api/light/<int:id>', methods=['GET'])
+def api_get_light(id):
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
         lights = LightValue.query.filter(LightValue.time == id).all()
@@ -176,8 +190,8 @@ def get_light(id):
 	return jsonify(res='no session')
 
 # LightValueテーブルへのレコードの追加
-@app.route('/light', methods=['POST'])
-def post_light():
+@app.route('/api/light', methods=['POST'])
+def api_post_light():
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
         if request.headers['Content-Type'] != 'application/json':
@@ -191,8 +205,8 @@ def post_light():
 	return jsonify(res='no session')
 
 # LightValueテーブルへの全レコード削除
-@app.route('/light', methods=['DELETE'])
-def delete_lights():
+@app.route('/api/light', methods=['DELETE'])
+def api_delete_lights():
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
         lights = LightValue.query.filter().all()
@@ -207,8 +221,8 @@ def delete_lights():
 	return jsonify(res='error')
 
 # LightValueテーブルへのレコードの削除
-@app.route('/light/<int:id>', methods=['DELETE'])
-def delete_light(id):
+@app.route('/api/light/<int:id>', methods=['DELETE'])
+def api_delete_light(id):
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
         lights = LightValue.query.filter(LightValue.id == id).first()
@@ -218,6 +232,3 @@ def delete_light(id):
     else:
 	return jsonify(res='error')
 
-if __name__ == '__main__':
-    app.run()
-    
