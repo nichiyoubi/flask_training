@@ -1,5 +1,6 @@
 # _*_ coding: utf-8 _*_
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
@@ -9,5 +10,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # 秘密鍵は後ほどランダム化する
 app.config['SECRET_KEY'] = 'The secret key which ciphers the cookie'
 
+db = SQLAlchemy(app)
+
+import robotapp.models
 import robotapp.views
 import robotapp.apis
