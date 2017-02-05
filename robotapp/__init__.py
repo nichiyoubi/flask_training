@@ -10,3 +10,4 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SECRET_KEY'] = 'The secret key which ciphers the cookie'
 
 import robotapp.views
+import robotapp.apis
