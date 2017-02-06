@@ -23,7 +23,7 @@ light = { 'mac' : 'abcdef01', 'time' : 1, 'value' : 400 }
 for mac in range(1, 4):
     # print mac
     light['mac'] = 'abcdef' + str(mac)
-    for time in range(1,11):
+    for time in range(11,21):
         # print time
 	light['time'] = time
 	light['value'] = random.uniform(1, 500)
