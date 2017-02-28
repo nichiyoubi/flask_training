@@ -18,21 +18,6 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-class LightValue(db.Model):
-    __tablename__ = 'light_value'
-    id = db.Column(db.Integer, primary_key = True)
-    mac = db.Column(db.String(8))
-    time = db.Column(db.Integer)
-    light = db.Column(db.Float)
-    
-    def __init__(self, mac, time, light):
-        self.mac = mac
-        self.time = time
-        self.light = light
-    
-    def __repr__(self):
-        return '<Mac %r Time %d, Light %f>' % (self.mac, self.time, self.light)
-
 # アカウントのチェック
 def is_account_valid():
     if request.form.get('username') is None:

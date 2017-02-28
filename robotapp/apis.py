@@ -2,7 +2,8 @@
 
 from robotapp import app
 from robotapp import db
-from robotapp import models
+from robotapp import model_users as user
+from robotapp import model_light_sensor as sensor
 from flask import request, redirect, url_for, jsonify, session
 import json
 from flask_sqlalchemy import SQLAlchemy
@@ -15,7 +16,7 @@ from flask_sqlalchemy import SQLAlchemy
 # ログイン処理
 @app.route('/api/login', methods=['POST'])
 def api_login():
-    if models.is_account_valid():
+    if user.is_account_valid():
         session['username'] = request.form['username']
 	return jsonify(res='ok')
     return jsonify(res='error')
@@ -33,7 +34,7 @@ def api_logout():
 def api_get_lights():
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
-        lights = models.LightValue.query.filter().all()
+        lights = sensor.LightValue.query.filter().all()
         if (len(lights) > 0):
 	    result = []
 	    for x in lights:
@@ -50,7 +51,7 @@ def api_get_lights():
 def api_get_light(id):
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
-        lights = models.LightValue.query.filter(LightValue.time == id).all()
+        lights = sensor.LightValue.query.filter(LightValue.time == id).all()
         if (len(lights) > 0):
 	    light = { 'mac' : lights[0].mac, 'time' : lights[0].time, 'value' : lights[0].light }
 	    return jsonify({'light' : light})
@@ -67,7 +68,7 @@ def api_post_light():
         if request.headers['Content-Type'] != 'application/json':
 	    return jsonify(res='error') 
 
-        light = models.LightValue(request.json['mac'], request.json['time'], request.json['value'])
+        light = sensor.LightValue(request.json['mac'], request.json['time'], request.json['value'])
         db.session.add(light)
         db.session.commit()
         return jsonify(res='ok')
@@ -79,7 +80,7 @@ def api_post_light():
 def api_delete_lights():
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
-        lights = models.LightValue.query.filter().all()
+        lights = sensor.LightValue.query.filter().all()
         if (len(lights) > 0):
             for x in lights:
                 db.session.delete(x)
@@ -95,7 +96,7 @@ def api_delete_lights():
 def api_delete_light(id):
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
-        lights = models.LightValue.query.filter(LightValue.id == id).first()
+        lights = sensor.LightValue.query.filter(LightValue.id == id).first()
         db.session.delete(lights)
         db.session.commit()
         return jsonify(res='ok')
