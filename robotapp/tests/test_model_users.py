@@ -1,6 +1,4 @@
 import unittest
-import sys
-sys.path.append('D:\\Users\\0000011305013\\Documents\\python\\flask_training')
 from robotapp import model_users
 
 class TestUsers(unittest.TestCase):
@@ -8,5 +6,7 @@ class TestUsers(unittest.TestCase):
 		self.assertTrue(False)
 
 
-if __name__ == '__main__':
-	unittest.main()
+# def suite():
+#         suite = unittest.TestSuite()
+#         suite.addTests(unittest.makeSuite(TestUsers))
+#         return suite
