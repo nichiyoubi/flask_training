@@ -2,7 +2,8 @@
 
 from robotapp import app
 from robotapp import db
-from robotapp import models
+from robotapp import model_users as user
+from robotapp import model_light_sensor as sensor 
 from flask import make_response, render_template, request, redirect
 from flask import url_for, jsonify, session
 import numpy as np
@@ -28,7 +29,7 @@ def error_handler(error):
 # ログイン処理
 @app.route('/login', methods=['POST'])
 def login():
-    if models.is_account_valid():
+    if user.is_account_valid():
         session['username'] = request.form['username']
 	if request.form['username'] == 'admin':
             return redirect(url_for('users'))
@@ -59,7 +60,7 @@ def device():
 def users():
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
-	users = models.User.query.filter().all()
+	users = user.User.query.filter().all()
         return render_template("users.html", users = users)
     else:
         return redirect(url_for('index'))
@@ -70,7 +71,7 @@ def graph(mac):
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
         fig = plt.figure()
-        lights = models.LightValue.query.filter(models.LightValue.mac == mac).all()
+        lights = sensor.LightValue.query.filter(sensor.LightValue.mac == mac).all()
         nx = np.array([])
         ny = np.array([])
         for x in lights:
@@ -93,7 +94,7 @@ def graph(mac):
 def table(mac):
     # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
     if session.get('username') is not None:
-        lights = models.LightValue.query.filter(models.LightValue.mac == mac).all()
+        lights = sensor.LightValue.query.filter(sensor.LightValue.mac == mac).all()
         return render_template("light_table.html", lights = lights)
     else:
         return redirect(url_for('index'))

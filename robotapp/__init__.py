@@ -12,6 +12,7 @@ app.config['SECRET_KEY'] = 'The secret key which ciphers the cookie'
 
 db = SQLAlchemy(app)
 
-import robotapp.models
+import robotapp.model_users
+import robotapp.model_light_sensor
 import robotapp.views
 import robotapp.apis
