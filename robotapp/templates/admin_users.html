@@ -3,6 +3,18 @@
 
   <div class="container">
     <h2>ユーザー一覧</h2>
+    
+    <form class="form-signin" action="/admin/users" method="POST">
+      <h2 class="form-signin-heading">Input a new user profile</h2>
+      <label for="inputName" class="sr-only">User name</label>
+      <input type="username" name="newusername" id="inputName" class="form-control" placeholder="User Name" required autofocus>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" name="newpassword" id="inputPassword" class="form-control" placeholder="Password" required>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Add a user</button>
+    </form>
+  </div> <!-- /container -->
+
+  <div class="container">
     <div class="table-responsive">
       <table class="table table-striped">
 	<thead>
@@ -21,7 +33,6 @@
 	</tbody>
       </table>
     </div>
-
   </div> <!-- /container -->
 {% endblock %}
 

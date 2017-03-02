@@ -98,3 +98,37 @@ def table(mac):
         return render_template("light_table.html", lights = lights)
     else:
         return redirect(url_for('index'))
+
+# ユーザー管理画面の表示
+@app.route('/admin/users', methods = ['GET'])
+def admin_user():
+    # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
+    if session.get('username') is not None:
+        if session.get('username') == 'admin':
+	    users = user.User.query.filter().all()
+	    return render_template("admin_users.html", users = users)
+	else:
+	    return redirect(url_for('device'))
+    else:
+        return redirect(url_for('index'))
+
+# ユーザー管理画面の表示
+@app.route('/admin/users', methods = ['POST'])
+def admin_add_user():
+    # セッションにusernameが保存されていなければ表紙ページにリダイレクトする
+    print session.get('username')
+    if session.get('username') is not None:
+	print "session ok"
+        if session.get('username') == 'admin':
+	    print "session is admin's"
+            db.session.add(user.User(request.form['newusername'],
+		                     request.form['newpassword']))
+            db.session.commit()
+	    users = user.User.query.filter().all()
+	    return render_template("admin_users.html", users = users)
+	else:
+	    print "session is not admin's"
+	    return redirect(url_for('device'))
+    else:
+	print "session error"
+        return redirect(url_for('index'))

@@ -103,3 +103,13 @@ def api_delete_light(id):
     else:
 	return jsonify(res='error')
 
+# Userテーブルへのレコードの追加（ユーザーの追加）
+@app.route('/api/admin/users', methods=['POST'])
+def api_admin_users():
+    if session.get('username') is not None:
+        users = user.User(request.form['newusername'], request.form['newpassword']) 
+        db.session.add(users)
+        db.session.commit()
+	return jsonify(res='ok')
+    return jsonify(res='error')
+
